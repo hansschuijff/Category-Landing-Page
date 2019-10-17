@@ -161,7 +161,7 @@
  		if( ! $location )
  			$location = $this->get_landing_id();
 
-		if( empty( $location ) )
+		if( empty( $location ) || get_query_var( 'paged' ) )
 			return;
 
  		$args = [ 'post_type' => $this->post_type, 'posts_per_page' => 1 ];
