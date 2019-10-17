@@ -4,6 +4,13 @@ Use the Gutenberg block editor to add content to the top of your category archiv
 
 Once installed and set up, go to Landing Pages > Add New. Add any number of blocks and content to your landing page.  Look for the "Appears On" box in the right column. Select the taxonomy (ex: "Category") and the taxonomy term (ex: "Appetizers") that you would like this landing page used on. Click "Publish" and your landing page content will appear at the top of the archive.
 
+## Screenshots
+![backend](https://p198.p4.n0.cdn.getcloudapp.com/items/GGu0RdK1/Screen+Shot+2019-10-17+at+9.44.09+AM.png?v=f208287ed2315888ac1c8047369ea3ae)
+Backend Editor
+
+![frontend](https://p198.p4.n0.cdn.getcloudapp.com/items/GGu0Rdyp/Screen+Shot+2019-10-17+at+9.45.45+AM.png?v=a9504ad4c04ed7aa90647dbb26d2f780)
+Frontend
+
 ## Setup
 
 You'll need to do a bit of coding to get the landing page content to appear on your category archive pages. Every theme is different so I recommend you talk to your theme developer for guidance on how to add this.
