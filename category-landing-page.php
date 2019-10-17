@@ -42,8 +42,8 @@
 			add_action( 'init', [ self::$instance, 'supported_taxonomies' ], 4 );
  			add_action( 'init', [ self::$instance, 'register_cpt' ], 12 );
 			add_action('acf/init', [ self::$instance, 'register_metabox' ] );
- 			add_action( 'template_redirect', [ self::$instance, 'redirect_single' ] );
- 			add_action( 'admin_bar_menu', [ self::$instance, 'admin_bar_link' ], 90 );
+ 			add_action( 'admin_bar_menu', [ self::$instance, 'admin_bar_link_front' ], 90 );
+			add_action( 'admin_bar_menu', [ self::$instance, 'admin_bar_link_back' ], 90 );
  		}
  		return self::$instance;
  	}
@@ -88,7 +88,7 @@
  			'has_archive'         => false,
  			'query_var'           => true,
  			'can_export'          => true,
- 			'rewrite'             => array( 'slug' => 'landing-page', 'with_front' => false ),
+ 			'rewrite'             => false,
  			'menu_icon'           => 'dashicons-welcome-widgets-menus',
  		);
 
@@ -152,30 +152,6 @@
 		acf_add_local_field_group( $settings );
 	}
 
- 	/**
- 	 * Redirect single landing page
- 	 *
- 	 */
- 	function redirect_single() {
- 		if( ! is_singular( $this->post_type ) )
- 			return;
-
- 		$supported = $this->supported_taxonomies;
- 		$taxonomy = get_post_meta( get_the_ID(), 'be_connected_taxonomy', true );
- 		$term = get_post_meta( get_the_ID(), 'be_connected_' . $taxonomy, true );
-
-
- 		if( empty( $term ) ) {
- 			$redirect = home_url();
- 		} else {
- 			$term = get_term_by( 'term_id', $term, $taxonomy );
- 			$redirect = get_term_link( $term, $taxonomy );
- 		}
-
- 		wp_redirect( $redirect );
- 		exit;
-
- 	}
 
  	/**
  	 * Show landing page
@@ -183,7 +159,7 @@
  	 */
  	function show( $location = '' ) {
  		if( ! $location )
- 			$location = $this->get_archive_id();
+ 			$location = $this->get_landing_id();
 
 		if( empty( $location ) )
 			return;
@@ -216,10 +192,10 @@
  	}
 
  	/**
- 	 * Get Archive ID
+ 	 * Get Landing Page ID
  	 *
  	 */
- 	function get_archive_id() {
+ 	function get_landing_id() {
  		$taxonomy = $this->get_taxonomy();
  		if( empty( $taxonomy ) || ! is_archive() )
  			return false;
@@ -248,11 +224,30 @@
 
  	}
 
+	/**
+	 * Get term link
+	 *
+	 */
+	function get_term_link( $archive_id = false ) {
+
+		if( empty( $archive_id ) )
+			return false;
+
+		$taxonomy = get_post_meta( $archive_id, 'be_connected_taxonomy', true );
+		$term = get_post_meta( $archive_id, 'be_connected_' . $taxonomy, true );
+
+		if( empty( $term ) )
+			return false;
+
+		$term = get_term_by( 'term_id', $term, $taxonomy );
+		return get_term_link( $term, $taxonomy );
+	}
+
  	/**
- 	 * Admin Bar Link
+ 	 * Admin Bar Link, Frontend
  	 *
  	 */
- 	 function admin_bar_link( $wp_admin_bar ) {
+ 	 function admin_bar_link_front( $wp_admin_bar ) {
  		 $taxonomy = $this->get_taxonomy();
  		 if( ! $taxonomy )
  		 	return;
@@ -260,7 +255,7 @@
  		if( ! ( is_user_logged_in() && current_user_can( 'edit_post' ) ) )
  			return;
 
- 		$archive_id = $this->get_archive_id();
+ 		$archive_id = $this->get_landing_id();
  		if( !empty( $archive_id ) ) {
  			$wp_admin_bar->add_node( array(
  				'id' => 'category_landing_page',
@@ -276,6 +271,33 @@
  			) );
  		}
  	 }
+
+	 /**
+  	 * Admin Bar Link, Backend
+  	 *
+  	 */
+  	 function admin_bar_link_back( $wp_admin_bar ) {
+		if( ! is_admin() )
+			return;
+
+		$screen = get_current_screen();
+		if( empty( $screen->id ) || $this->post_type !== $screen->id )
+			return;
+
+		$archive_id = !empty( $_GET['post'] ) ? intval( $_GET['post'] ) : false;
+		if( ! $archive_id )
+			return;
+
+		$term_link = $this->get_term_link( $archive_id );
+		if( empty( $term_link ) )
+			return;
+
+		$wp_admin_bar->add_node( array(
+			'id'	=> 'category_landing_page',
+			'title'	=> 'View Landing Page',
+			'href'	=> $term_link,
+		));
+  	 }
  }
 
  /**
