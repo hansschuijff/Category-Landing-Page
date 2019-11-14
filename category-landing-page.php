@@ -252,7 +252,7 @@
  		 if( ! $taxonomy )
  		 	return;
 
- 		if( ! ( is_user_logged_in() && current_user_can( 'edit_post' ) ) )
+ 		if( ! ( is_user_logged_in() && current_user_can( 'manage_categories' ) ) )
  			return;
 
  		$archive_id = $this->get_landing_id();
