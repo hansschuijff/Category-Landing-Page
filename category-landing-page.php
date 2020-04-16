@@ -330,7 +330,7 @@ class Category_Landing_Page {
 		if( empty( $term_link ) )
 			return;
 
-		$icon = ''
+		$icon = '';
 		$wp_admin_bar->add_node( array(
 			'id'	=> 'category_landing_page',
 			'title'	=> $icon . 'View Landing Page',
